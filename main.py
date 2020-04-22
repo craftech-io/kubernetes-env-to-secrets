@@ -1,9 +1,9 @@
 import argparse
 import sys
-import configparser
-import itertools
 import base64
 from string import Template
+
+
 
 parser = argparse.ArgumentParser(description='Convert environment files to kubernetes secrets')
 parser.add_argument('--name', metavar='name', nargs='?', type=str, default='my-secrets', help='Name of the secret store')
@@ -12,23 +12,24 @@ parser.add_argument('--secrets', metavar='.yaml', nargs='?', type=argparse.FileT
 
 args = parser.parse_args()
 
-config = configparser.ConfigParser()
-config.read_file(itertools.chain(['[global]'], args.env), source="env")
-secrets = config.items('global')
+config_lines = args.env.readlines()
 args.env.close()
 
-def loadFiles(secret):
-  if (secret[1].startswith('filecontent=')):
-    with open(secret[1][12:], 'r') as secretfile:
-      data = secretfile.read()
-      return [secret[0], data]
-  return secret
 
+
+def loadFiles(secret):
+    if (secret[1].startswith('filecontent=')):
+        with open(secret[1][12:], 'r') as secretfile:
+            data = secretfile.read()
+        return [secret[0], data]
+    return secret
+
+secrets = [line.split('=', 1) for line in config_lines]
 secrets = map(loadFiles, secrets)
 
 encodedSecrets = ['  {0}: {1}'.format(
     secret[0],
-    base64.b64encode(secret[1].encode('utf-8')).decode('utf-8')
+    base64.b64encode(secret[1].replace('\n', '').encode('utf-8')).decode('utf-8')
 ) for secret in secrets]
 
 yamlTemplate = Template("""apiVersion: v1
