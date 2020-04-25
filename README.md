@@ -41,3 +41,32 @@ data:
   bonjour_les_gens: YWJjZGVm
   secret_file: aGVsbG8K
 ```
+Can also supports environment files in json
+
+#### Example: 
+
+```sh
+$ cat env.json
+{
+CANARD": "true",
+LAPIN": "12343",
+BONJOUR_LES_GENS": "abcdef"
+}
+```
+
+```sh
+$ python main.py --env env.json --name lapin
+```
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: lapin
+type: Opaque
+data:
+  canard: dHJ1ZQ==
+  lapin: MTIzNDM=
+  bonjour_les_gens: YWJjZGVm
+  secret_file: aGVsbG8K
+```
