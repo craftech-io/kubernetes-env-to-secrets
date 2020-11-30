@@ -49,6 +49,7 @@ def process_plainfile(_args):
         m = env_regex.match(line)
         if m:
             secrets.append((m.group('variable'), m.group('value')))
+    secrets = map(load_files, secrets)
     encoded_secrets = ['  {0}: {1}'.format(
         secret[0],
         base64.b64encode(secret[1].replace('\n', '').encode('utf-8')).decode('utf-8')
