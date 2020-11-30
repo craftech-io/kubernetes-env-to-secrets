@@ -3,6 +3,7 @@ import sys
 import base64
 import json
 from string import Template
+import re
 
 parser = argparse.ArgumentParser(description='Convert environment files to kubernetes secrets')
 parser.add_argument('--name', metavar='name', nargs='?', type=str, default='my-secrets',
@@ -11,6 +12,8 @@ parser.add_argument('--env', metavar='.env', nargs='?', type=argparse.FileType('
                     help='Environment input file, stdin by default')
 parser.add_argument('--secrets', metavar='.yaml', nargs='?', type=argparse.FileType('w'), default=sys.stdout,
                     help='Secrets output file, stdout by default')
+
+env_regex = re.compile(r'^(?P<variable>[a-zA-Z]\w*)\s*=\s*(?P<value>.*?)\s*?(?P<comment>#.*?)?$')
 
 
 def load_files(secret):
@@ -39,11 +42,13 @@ $encodedSecrets""")
 
 
 def process_plainfile(_args):
-    config_lines = _args.env.readlines()
+    config_lines = _args.env.read().splitlines()
     _args.env.close()
-    secrets = [line.split('=', 1) for line in config_lines]
-    secrets = map(load_files, secrets)
-
+    secrets = []
+    for line in config_lines:
+        m = env_regex.match(line)
+        if m:
+            secrets.append((m.group('variable'), m.group('value')))
     encoded_secrets = ['  {0}: {1}'.format(
         secret[0],
         base64.b64encode(secret[1].replace('\n', '').encode('utf-8')).decode('utf-8')
