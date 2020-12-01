@@ -47,10 +47,12 @@ Can also supports environment files in json
 
 ```sh
 $ cat env.json
+```
+```json
 {
-CANARD": "true",
-LAPIN": "12343",
-BONJOUR_LES_GENS": "abcdef"
+  "CANARD": "true",
+  "LAPIN": "12343",
+  "BONJOUR_LES_GENS": "abcdef"
 }
 ```
 
@@ -68,5 +70,4 @@ data:
   canard: dHJ1ZQ==
   lapin: MTIzNDM=
   bonjour_les_gens: YWJjZGVm
-  secret_file: aGVsbG8K
 ```
