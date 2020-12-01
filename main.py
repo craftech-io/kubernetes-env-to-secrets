@@ -13,7 +13,7 @@ parser.add_argument('--env', metavar='.env', nargs='?', type=argparse.FileType('
 parser.add_argument('--secrets', metavar='.yaml', nargs='?', type=argparse.FileType('w'), default=sys.stdout,
                     help='Secrets output file, stdout by default')
 
-env_regex = re.compile(r'^(?P<variable>[a-zA-Z]\w*)\s*=\s*(?P<value>.*?)\s*?(?P<comment>#.*?)?$')
+env_regex = re.compile(r'^(?P<variable>[a-zA-Z]\w*)\s*=\s*(?P<value>.*?)(?P<comment>\s+#.*?)?$')
 
 
 def load_files(secret):
